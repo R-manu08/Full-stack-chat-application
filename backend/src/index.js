@@ -41,13 +41,18 @@ const limiter = rateLimit({
 });
 app.use("/api/auth", limiter);
 
-app.use(express.json({ limit: "10kb" })); // Body parser, limiting data size
+app.use(express.json({ limit: "50mb" })); // Body parser, limiting data size
 app.use(cookieParser());
 app.use(morgan("dev"));
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://10.223.152.181:5173"], 
+    origin: [
+      "http://localhost:5173",
+      "http://10.223.152.181:5173",
+      "http://localhost:5176",
+      "http://10.94.195.181:5176"
+    ],
     credentials: true,
   })
 );
