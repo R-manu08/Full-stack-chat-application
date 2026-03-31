@@ -94,7 +94,13 @@ export const updateProfile = async (req, res) => {
       return res.status(400).json({ message: "Profile pic is required" });
     }
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+    let uploadResponse;
+    if (!process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME === "your_cloud_name") {
+      console.warn("Cloudinary not configured. Skipping image upload.");
+      return res.status(400).json({ message: "Image upload is currently unavailable (Cloudinary not configured)." });
+    }
+
+    uploadResponse = await cloudinary.uploader.upload(profilePic);
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { profilePic: uploadResponse.secure_url },

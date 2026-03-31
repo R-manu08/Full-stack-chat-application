@@ -3,7 +3,7 @@ import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5001" : "/";
+const BASE_URL = import.meta.env.MODE === "development" ? `http://${window.location.hostname}:5001` : "/";
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -46,7 +46,8 @@ export const useAuthStore = create((set, get) => ({
       toast.success("Account created successfully");
       get().connectSocket();
     } catch (error) {
-      toast.error(error.response?.data?.message || "An error occurred");
+      const message = error.response?.data?.message || error.message || "Failed to connect to server";
+      toast.error(message);
     } finally {
       set({ isSigningUp: false });
     }
@@ -63,7 +64,8 @@ export const useAuthStore = create((set, get) => ({
       get().connectSocket();
     } catch (error) {
       console.error("Login error:", error);
-      toast.error(error.response?.data?.message || "An error occured");
+      const message = error.response?.data?.message || error.message || "Failed to connect to server";
+      toast.error(message);
     } finally {
       set({ isLoggingIn: false });
     }
@@ -76,7 +78,8 @@ export const useAuthStore = create((set, get) => ({
       toast.success("Logged out successfully");
       get().disconnectSocket();
     } catch (error) {
-      toast.error(error.response?.data?.message || "An error occurred");
+      const message = error.response?.data?.message || error.message || "Failed to connect to server";
+      toast.error(message);
     }
   },
 
@@ -88,7 +91,8 @@ export const useAuthStore = create((set, get) => ({
       toast.success("Profile updated successfully");
     } catch (error) {
       console.log("error in update profile:", error);
-      toast.error(error.response?.data?.message || "error occured");
+      const message = error.response?.data?.message || error.message || "Failed to connect to server";
+      toast.error(message);
     } finally {
       set({ isUpdatingProfile: false });
     }

@@ -69,9 +69,14 @@ const Sidebar = () => {
 
             {/* User info - only visible on larger screens */}
             <div className="hidden lg:block text-left min-w-0">
-              <div className="font-medium truncate">{user.fullName}</div>
+              <div className="font-medium truncate flex items-center gap-2">
+                {user.fullName}
+                {user._id === "000000000000000000000001" && (
+                  <span className="badge badge-primary badge-xs py-2 px-1 text-[10px] font-bold">AI</span>
+                )}
+              </div>
               <div className="text-sm text-zinc-400">
-                {onlineUsers.includes(user._id) ? "Online" : "Offline"}
+                {user._id === "000000000000000000000001" ? "Ask me anything!" : (onlineUsers.includes(user._id) ? "Online" : "Offline")}
               </div>
             </div>
           </button>

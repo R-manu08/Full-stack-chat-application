@@ -19,9 +19,14 @@ const ChatHeader = () => {
 
           {/* User info */}
           <div>
-            <h3 className="font-medium">{selectedUser.fullName}</h3>
+            <h3 className="font-medium flex items-center gap-2">
+              {selectedUser.fullName}
+              {selectedUser._id === "000000000000000000000001" && (
+                <span className="badge badge-primary badge-sm font-bold">AI</span>
+              )}
+            </h3>
             <p className="text-sm text-base-content/70">
-              {onlineUsers.includes(selectedUser._id) ? "Online" : "Offline"}
+              {selectedUser._id === "000000000000000000000001" ? "Ask me anything!" : (onlineUsers.includes(selectedUser._id) ? "Online" : "Offline")}
             </p>
           </div>
         </div>

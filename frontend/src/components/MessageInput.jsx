@@ -1,13 +1,53 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { useChatStore } from '../store/useChatStore';
-import { Image, Send, X } from 'lucide-react';
+import { Image, Send, X, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
+import axios from 'axios';
+
+const BASE_URL = import.meta.env.MODE === "development" ? `http://${window.location.hostname}:5001` : "/";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
+  const [smartReplies, setSmartReplies] = useState([]);
+  const [loadingReplies, setLoadingReplies] = useState(false);
   const fileInputRef = useRef(null);
-  const { sendMessage } = useChatStore();
+  const { sendMessage, messages, selectedUser } = useChatStore();
+
+  // Fetch smart replies when the last received message changes
+  useEffect(() => {
+    if (!messages || messages.length === 0 || !selectedUser) return;
+
+    const lastMsg = messages[messages.length - 1];
+    // Only generate smart replies for messages received from others
+    const authUser = JSON.parse(localStorage.getItem("chat-user") || "{}");
+    if (lastMsg.senderId === authUser._id) {
+      setSmartReplies([]);
+      return;
+    }
+
+    if (!lastMsg.text) {
+      setSmartReplies([]);
+      return;
+    }
+
+    const fetchSmartReplies = async () => {
+      setLoadingReplies(true);
+      try {
+        const res = await axios.get(
+          `${BASE_URL}/api/messages/smart-replies?message=${encodeURIComponent(lastMsg.text)}`,
+          { withCredentials: true }
+        );
+        setSmartReplies(res.data.suggestions || []);
+      } catch {
+        setSmartReplies([]);
+      } finally {
+        setLoadingReplies(false);
+      }
+    };
+
+    fetchSmartReplies();
+  }, [messages, selectedUser]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -26,7 +66,6 @@ const MessageInput = () => {
   const removeImage = () => {
     setImagePreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
-
   };
 
   const handleSendMessage = async (e) => {
@@ -39,14 +78,46 @@ const MessageInput = () => {
       });
       setText("");
       setImagePreview(null);
-      if(!fileInputRef.current) fileInputRef.current.value = ""; 
+      setSmartReplies([]);
+      if(fileInputRef.current) fileInputRef.current.value = ""; 
     } catch (error) {
       console.error("Failed to send message", error);
     }
   };
 
+  const handleSmartReplyClick = async (reply) => {
+    try {
+      await sendMessage({ text: reply, image: null });
+      setSmartReplies([]);
+      setText("");
+    } catch (error) {
+      console.error("Failed to send smart reply", error);
+    }
+  };
+
   return (
     <div className="p-4 w-full">
+      {/* Smart Reply Chips */}
+      {(smartReplies.length > 0 || loadingReplies) && (
+        <div className="mb-3 flex flex-wrap gap-2 items-center">
+          <Sparkles size={14} className="text-primary opacity-70" />
+          {loadingReplies ? (
+            <span className="text-xs text-zinc-400 animate-pulse">Generating smart replies...</span>
+          ) : (
+            smartReplies.map((reply, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => handleSmartReplyClick(reply)}
+                className="btn btn-xs btn-outline btn-primary rounded-full text-xs px-3 py-1 hover:scale-105 transition-transform"
+              >
+                {reply}
+              </button>
+            ))
+          )}
+        </div>
+      )}
+
       {imagePreview && (
         <div className="mb-3 flex items-center gap-2">
           <div className="relative">
