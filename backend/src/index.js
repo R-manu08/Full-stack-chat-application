@@ -50,8 +50,11 @@ app.use(
     origin: function (origin, callback) {
       // Allow requests with no origin (like mobile apps or curl)
       if (!origin) return callback(null, true);
-      // Allow any localhost or local network IP
-      if (origin.match(/^http:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|172\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+)(:\d+)?$/)) {
+      // Allow any localhost, local network IP, secure tunnel, or dev fallback
+      if (origin.match(/^https?:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|172\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+)(:\d+)?$/) ||
+          origin.includes("loca.lt") ||
+          origin.includes("ngrok-free.app") ||
+          process.env.NODE_ENV !== "production") {
         return callback(null, true);
       }
       callback(new Error("Not allowed by CORS"));

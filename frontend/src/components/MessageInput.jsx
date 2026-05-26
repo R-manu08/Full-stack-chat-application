@@ -2,11 +2,9 @@ import React, { useRef, useState, useEffect } from 'react'
 import { useChatStore } from '../store/useChatStore';
 import { Image, Send, X, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import { axiosInstance } from '../lib/axios';
 import EmojiPicker from 'emoji-picker-react';
 import { Smile } from 'lucide-react';
-
-const BASE_URL = import.meta.env.MODE === "development" ? `http://${window.location.hostname}:5001` : "/";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
@@ -38,9 +36,8 @@ const MessageInput = () => {
     const fetchSmartReplies = async () => {
       setLoadingReplies(true);
       try {
-        const res = await axios.get(
-          `${BASE_URL}/api/messages/smart-replies?message=${encodeURIComponent(lastMsg.text)}`,
-          { withCredentials: true }
+        const res = await axiosInstance.get(
+          `/messages/smart-replies?message=${encodeURIComponent(lastMsg.text)}`
         );
         setSmartReplies(res.data.suggestions || []);
       } catch {

@@ -10,7 +10,10 @@ const io = new Server(server, {
     cors: {
         origin: function (origin, callback) {
             if (!origin) return callback(null, true);
-            if (origin.match(/^http:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|172\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+)(:\d+)?$/)) {
+            if (origin.match(/^https?:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|172\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+)(:\d+)?$/) || 
+                origin.includes("loca.lt") || 
+                origin.includes("ngrok-free.app") || 
+                process.env.NODE_ENV !== "production") {
               return callback(null, true);
             }
             callback(null, false);

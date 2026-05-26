@@ -15,12 +15,12 @@ const Navbar = () => {
     setNetworkUrl(""); // Reset while loading
     try {
       const res = await axiosInstance.get("/auth/network-ip");
-      const port = window.location.port || "80";
-      setNetworkUrl(`http://${res.data.ip}:${port}/signup`);
+      const port = window.location.port ? `:${window.location.port}` : "";
+      setNetworkUrl(`${window.location.protocol}//${res.data.ip}${port}/signup`);
     } catch (err) {
       console.error("Error fetching IP", err);
-      const port = window.location.port || "80";
-      setNetworkUrl(`http://localhost:${port}/signup`);
+      const port = window.location.port ? `:${window.location.port}` : "";
+      setNetworkUrl(`${window.location.protocol}//localhost${port}/signup`);
     }
   };
 

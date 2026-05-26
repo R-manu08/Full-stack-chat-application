@@ -11,6 +11,10 @@ This is a comprehensive, production-ready fullstack real-time chat application. 
 - **AI-Powered Smart Replies:** Real-time generation of contextual reply suggestions using an external LLM API (Gemini). 
 - **Secure Authentication:** JWT-based protection for all REST endpoints and user sessions.
 - **Message Status Tracking:** Visual checkmarks mirroring typical chat apps (Sent ✓, Delivered ✓✓, Seen ✓✓).
+- **WebRTC Video Calling:** High-performance, low-latency video calls between users using peer-to-peer technology.
+- **Real-Time Typing Indicators:** Visual feedback telling you exactly when your friend is drafting a response.
+- **Emoji Support:** Integrated emoji picker in the chat input for expressive communication.
+- **Universal Mobile Invite:** QR code scan with adaptive IP detection and manual override for easy cross-device testing.
 - **Profile Management:** Users can upload profile images (powered by Cloudinary).
 - **Theme Customization:** Support for dynamic UI themes.
 
@@ -41,7 +45,9 @@ A robust, secure, and horizontally scalable backend.
 2. ✅ **Develop backend APIs and database**
 3. ✅ **Implement Socket.io real-time chat**
 4. ✅ **Integrate AI smart reply feature**
-5. ⏳ **Testing, debugging, and deployment** *(Current Phase)*
+5. ✅ **Add WebRTC Video Calling & Emoji Support**
+6. ✅ **Develop Real-Time Typing Indicators**
+7. ✅ **Testing, debugging, and final documentation**
 
 ---
 
@@ -51,6 +57,7 @@ A robust, secure, and horizontally scalable backend.
 - **Backend Source Code** (`/backend`)
 - **Database Schema** (Inside `/backend/src/models`)
 - **AI Integration Module** (`/backend/src/lib/gemini.js` & Smart Reply endpoints)
+- **WebRTC Signaling & Video Modal** (`/frontend/src/store/useCallStore.jsx` & `/frontend/src/components/VideoModal.jsx`)
 - **Project Documentation** (This README file)
 
 ---
