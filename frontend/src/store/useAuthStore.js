@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
+import { useCallStore } from "./useCallStore.jsx";
 
 const BASE_URL = import.meta.env.MODE === "development" ? `http://${window.location.hostname}:5001` : "/";
 
@@ -111,6 +112,23 @@ export const useAuthStore = create((set, get) => ({
     set({ socket: socket });
     socket.on("getOnlineUsers", (userIds) => {
       set({ onlineUsers: userIds });
+    });
+
+    socket.on("incoming-call", ({ from, offer }) => {
+      useCallStore.getState().handleIncomingCall(from, offer);
+    });
+
+    socket.on("call-answered", ({ answer }) => {
+      useCallStore.getState().handleAnswer(answer);
+    });
+
+    socket.on("ice-candidate", ({ candidate }) => {
+      useCallStore.getState().handleIceCandidate(candidate);
+    });
+
+    socket.on("call-declined", () => {
+      toast.error("Call declined");
+      useCallStore.getState().endCall();
     });
   },
 

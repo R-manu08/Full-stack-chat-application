@@ -8,7 +8,14 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:5173"]
+        origin: function (origin, callback) {
+            if (!origin) return callback(null, true);
+            if (origin.match(/^http:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|172\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+)(:\d+)?$/)) {
+              return callback(null, true);
+            }
+            callback(null, false);
+          },
+        credentials: true
     }
 });
 
@@ -45,6 +52,50 @@ io.on("connection", (socket) => {
     }
 
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
+
+    // Typing Indicators
+    socket.on("typing", ({ receiverId }) => {
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("userTyping", { senderId: userId });
+        }
+    });
+
+    socket.on("stop-typing", ({ receiverId }) => {
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("userStoppedTyping", { senderId: userId });
+        }
+    });
+
+    // WebRTC Video Call Signaling
+    socket.on("call-user", ({ to, offer }) => {
+        const receiverSocketId = getReceiverSocketId(to);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("incoming-call", { from: userId, offer });
+        }
+    });
+
+    socket.on("answer-call", ({ to, answer }) => {
+        const receiverSocketId = getReceiverSocketId(to);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("call-answered", { answer });
+        }
+    });
+
+    socket.on("ice-candidate", ({ to, candidate }) => {
+        const receiverSocketId = getReceiverSocketId(to);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("ice-candidate", { candidate });
+        }
+    });
+
+    socket.on("decline-call", ({ to }) => {
+        const receiverSocketId = getReceiverSocketId(to);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("call-declined");
+        }
+    });
 
     socket.on("disconnect", () => {
         console.log("A user disconnected", socket.id);

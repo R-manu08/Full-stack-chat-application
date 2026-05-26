@@ -3,6 +3,8 @@ import { useChatStore } from '../store/useChatStore';
 import { Image, Send, X, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import EmojiPicker from 'emoji-picker-react';
+import { Smile } from 'lucide-react';
 
 const BASE_URL = import.meta.env.MODE === "development" ? `http://${window.location.hostname}:5001` : "/";
 
@@ -12,7 +14,9 @@ const MessageInput = () => {
   const [smartReplies, setSmartReplies] = useState([]);
   const [loadingReplies, setLoadingReplies] = useState(false);
   const fileInputRef = useRef(null);
-  const { sendMessage, messages, selectedUser } = useChatStore();
+  const typingTimeoutRef = useRef(null);
+  const { sendMessage, messages, selectedUser, setTyping } = useChatStore();
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   // Fetch smart replies when the last received message changes
   useEffect(() => {
@@ -80,9 +84,26 @@ const MessageInput = () => {
       setImagePreview(null);
       setSmartReplies([]);
       if(fileInputRef.current) fileInputRef.current.value = ""; 
+      
+      // Stop typing indicator on send
+      setTyping(false);
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     } catch (error) {
       console.error("Failed to send message", error);
     }
+  };
+
+  const handleInputChange = (e) => {
+    setText(e.target.value);
+    
+    // Typing indicator logic
+    setTyping(true);
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+    typingTimeoutRef.current = setTimeout(() => {
+      setTyping(false);
+    }, 3000);
   };
 
   const handleSmartReplyClick = async (reply) => {
@@ -93,6 +114,10 @@ const MessageInput = () => {
     } catch (error) {
       console.error("Failed to send smart reply", error);
     }
+  };
+
+  const onEmojiClick = (emojiData) => {
+    setText((prev) => prev + emojiData.emoji);
   };
 
   return (
@@ -138,14 +163,37 @@ const MessageInput = () => {
         </div>
       )}
 
-      <form onSubmit={handleSendMessage} className="flex items-center gap-2">
-        <div className="flex-1 flex gap-2">
+      <form onSubmit={handleSendMessage} className="flex items-center gap-2 relative">
+        <div className="flex-1 flex gap-2 items-center">
+          <div className="relative">
+            <button
+              type="button"
+              className="btn btn-sm btn-ghost btn-circle text-zinc-400"
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            >
+              <Smile size={20} />
+            </button>
+            
+            {showEmojiPicker && (
+              <div className="absolute bottom-12 left-0 z-50">
+                <EmojiPicker 
+                  onEmojiClick={onEmojiClick} 
+                  theme="dark"
+                  skinTonesDisabled
+                  searchDisabled
+                  height={350}
+                  width={300}
+                />
+              </div>
+            )}
+          </div>
+
           <input
             type="text"
             className="w-full input input-bordered rounded-lg input-sm sm:input-md"
             placeholder="Type a message..."
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={handleInputChange}
           />
           <input
             type="file"

@@ -10,6 +10,7 @@ import { useAuthStore } from './store/useAuthStore.js'
 import { Loader } from "lucide-react"
 import {Toaster} from "react-hot-toast"
 import { useThemeStore } from './store/useThemeStore.js'
+import VideoModal from './components/VideoModal.jsx'
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
@@ -43,6 +44,7 @@ const App = () => {
         </Routes>
 
         <Toaster />
+        <VideoModal />
       </div>
     </>
   )

@@ -10,7 +10,7 @@ import { Check, CheckCheck } from 'lucide-react';
 
 
 const ChatContainer = () => {
-  const { messages, getMessages, isMessagesLoading, selectedUser, subscribeToMessages, unsubscribeFromMessage, markMessagesAsSeen } = useChatStore();
+  const { messages, getMessages, isMessagesLoading, selectedUser, subscribeToMessages, unsubscribeFromMessage, markMessagesAsSeen, typingUsers } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
 
@@ -91,6 +91,23 @@ const ChatContainer = () => {
             </div>
           </div>
         ))}
+        {/* Typing Indicator */}
+        {selectedUser && typingUsers.includes(selectedUser._id) && (
+          <div className="chat chat-start animate-pulse">
+            <div className="chat-image avatar">
+              <div className="size-10 rounded-full border">
+                <img src={selectedUser.profilePic || "/avatar.png"} alt="profile pic" />
+              </div>
+            </div>
+            <div className="chat-bubble bg-base-200 text-zinc-500 py-2">
+              <div className="flex gap-1">
+                <span className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce"></span>
+                <span className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                <span className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <MessageInput />

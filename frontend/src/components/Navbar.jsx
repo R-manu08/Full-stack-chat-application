@@ -15,10 +15,12 @@ const Navbar = () => {
     setNetworkUrl(""); // Reset while loading
     try {
       const res = await axiosInstance.get("/auth/network-ip");
-      setNetworkUrl(`http://${res.data.ip}:5173/signup`);
+      const port = window.location.port || "80";
+      setNetworkUrl(`http://${res.data.ip}:${port}/signup`);
     } catch (err) {
       console.error("Error fetching IP", err);
-      setNetworkUrl(`http://localhost:5173/signup`);
+      const port = window.location.port || "80";
+      setNetworkUrl(`http://localhost:${port}/signup`);
     }
   };
 
@@ -102,13 +104,19 @@ const Navbar = () => {
               )}
             </div>
 
-            {networkUrl && (
-              <div className="mt-6">
-                <p className="text-center text-xs font-mono bg-base-200 p-2 rounded-lg truncate text-base-content/70">
-                  {networkUrl}
-                </p>
-              </div>
-            )}
+            <div className="mt-6 flex flex-col gap-2">
+              <label className="text-[10px] font-bold text-base-content/50 uppercase px-1">Invite Link (Editable)</label>
+              <input 
+                type="text"
+                value={networkUrl}
+                onChange={(e) => setNetworkUrl(e.target.value)}
+                className="input input-sm input-bordered w-full font-mono text-xs"
+                placeholder="Enter invite URL manually..."
+              />
+              <p className="text-[10px] text-zinc-500 text-center italic">
+                Tip: If QR fails, type your Laptop's WiFi IP above.
+              </p>
+            </div>
           </div>
         </div>
       )}

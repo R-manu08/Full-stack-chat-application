@@ -128,16 +128,21 @@ export const getNetworkIp = (req, res) => {
   try {
     const interfaces = os.networkInterfaces();
     let networkIp = "localhost";
+    let candidateIps = [];
 
     for (const name of Object.keys(interfaces)) {
       for (const iface of interfaces[name]) {
         if (iface.family === 'IPv4' && !iface.internal) {
-          networkIp = iface.address;
-          break;
+          candidateIps.push(iface.address);
         }
       }
-      if (networkIp !== "localhost") break;
     }
+
+    // Prioritize 192.168. (Standard home WiFi)
+    networkIp = candidateIps.find(ip => ip.startsWith("192.168.")) || 
+                candidateIps.find(ip => ip.startsWith("10.")) ||
+                candidateIps[0] || 
+                "localhost";
 
     res.status(200).json({ ip: networkIp });
   } catch (error) {
