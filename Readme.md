@@ -104,8 +104,23 @@ npm run dev
 
 ---
 
+## 👥 Meet the Team & Contributors
+
+The success of this project is driven by our talented core team:
+
+| Profile | Name | Role | GitHub |
+| :--- | :--- | :--- | :--- |
+| ![Garv](https://github.com/Garvsidhwan01.png?size=40) | **Garv** | Backend & Security | [@Garvsidhwan01](https://github.com/Garvsidhwan01) |
+| ![Arpit](https://github.com/arpsharma19.png?size=40) | **Arpit Dutt Sharma** | Frontend UI/UX | [@arpsharma19](https://github.com/arpsharma19) |
+| ![Vaishali](https://github.com/vishurrrr.png?size=40) | **Vaishali** | API & Integration | [@vishurrrr](https://github.com/vishurrrr) |
+| ![Ragini](https://github.com/R-manu08.png?size=40) | **Ragini** | Real-Time & AI | [@R-manu08](https://github.com/R-manu08) |
+
+*For more detailed contribution history, see our [CONTRIBUTORS.md](./CONTRIBUTORS.md) file.*
+
+---
+
 ## 🤝 Contributions
-Contributions are welcome! Feel free to fork this repository and submit a pull request.
+Feel free to fork this repository and submit a pull request if you'd like to help improve this project!
 
 ## 📄 License
 This project is licensed under the MIT License.
