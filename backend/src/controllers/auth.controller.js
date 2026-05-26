@@ -1,3 +1,38 @@
+// TEMPORARY: Add sample users for testing
+export const addSampleUsers = async (req, res) => {
+  const samples = [
+    { fullName: "Alice Example", email: "alice@example.com", password: "alice123" },
+    { fullName: "Bob Example", email: "bob@example.com", password: "bob12345" },
+    { fullName: "Charlie Example", email: "charlie@example.com", password: "charlie789" }
+  ];
+  try {
+    const bcrypt = (await import('bcryptjs')).default;
+    for (const user of samples) {
+      const exists = await User.findOne({ email: user.email });
+      if (!exists) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(user.password, salt);
+        await User.create({
+          fullName: user.fullName,
+          email: user.email,
+          password: hashedPassword,
+        });
+      }
+    }
+    res.status(201).json({ message: "Sample users added", users: samples.map(u => ({ email: u.email, password: u.password })) });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding sample users", error: error.message });
+  }
+};
+// TEMPORARY: Count registered user emails
+export const countUsers = async (req, res) => {
+  try {
+    const count = await User.countDocuments();
+    res.status(200).json({ count });
+  } catch (error) {
+    res.status(500).json({ message: "Error counting users" });
+  }
+};
 import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
