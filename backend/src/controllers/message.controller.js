@@ -46,16 +46,19 @@ export const sendMessage = async (req, res) => {
       imageUrl = uploadResponse.secure_url;
     }
 
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    const initialStatus = receiverSocketId ? "delivered" : "sent";
+
     const newMessage = new Message({
       senderId,
       receiverId,
       text,
       image: imageUrl,
+      status: initialStatus,
     });
 
     await newMessage.save();
 
-    const receiverSocketId = getReceiverSocketId(receiverId);
     if(receiverSocketId){
       io.to(receiverSocketId).emit("newMessage", newMessage);
     }
@@ -139,6 +142,28 @@ export const getSmartReplies = async (req, res) => {
     res.status(200).json({ suggestions });
   } catch (error) {
     console.error("Error in getSmartReplies", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const markMessagesAsSeen = async (req, res) => {
+  try {
+    const { id: senderId } = req.params;
+    const receiverId = req.user._id;
+
+    await Message.updateMany(
+      { senderId, receiverId, status: { $ne: "seen" } },
+      { $set: { status: "seen" } }
+    );
+
+    const senderSocketId = getReceiverSocketId(senderId);
+    if (senderSocketId) {
+      io.to(senderSocketId).emit("messagesSeen", { receiverId });
+    }
+
+    res.status(200).json({ message: "Messages marked as seen" });
+  } catch (error) {
+    console.error("Error in markMessagesAsSeen: ", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 };

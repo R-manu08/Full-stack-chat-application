@@ -6,19 +6,22 @@ import MessageInput from './MessageInput.jsx';
 import MessageSkeleton from './skeleton/MessageSkeleton.jsx';
 import { useAuthStore } from '../store/useAuthStore.js';
 import { formatMessageTime } from '../lib/utils.js';
+import { Check, CheckCheck } from 'lucide-react';
 
 
 const ChatContainer = () => {
-  const { messages, getMessages, isMessagesLoading, selectedUser, subscribeToMessages, unsubscribeFromMessage } = useChatStore();
+  const { messages, getMessages, isMessagesLoading, selectedUser, subscribeToMessages, unsubscribeFromMessage, markMessagesAsSeen } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
+
   useEffect(() => {
     getMessages(selectedUser._id);
+    markMessagesAsSeen(selectedUser._id);
 
     subscribeToMessages();
 
     return () => unsubscribeFromMessage();
-  }, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeFromMessage]);
+  }, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeFromMessage, markMessagesAsSeen]);
 
   useEffect(() => {
     if (messageEndRef.current && messages) {
@@ -60,10 +63,21 @@ const ChatContainer = () => {
                 />
               </div>
             </div>
-            <div className="chat-header mb-1">
+            <div className="chat-header mb-1 flex items-center gap-1">
               <time className="text-xs opacity-50 ml-1">
                 {formatMessageTime(message.createdAt)}
               </time>
+              {message.senderId === authUser._id && (
+                <span className="ml-1 flex items-center">
+                  {message.status === "seen" ? (
+                    <CheckCheck className="text-blue-500 w-4 h-4" />
+                  ) : message.status === "delivered" ? (
+                    <CheckCheck className="text-gray-400 w-4 h-4" />
+                  ) : (
+                    <Check className="text-gray-400 w-4 h-4" />
+                  )}
+                </span>
+              )}
             </div>
             <div className="chat-bubble flex flex-col">
               {message.image && (

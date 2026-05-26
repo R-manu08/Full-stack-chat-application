@@ -2,6 +2,7 @@ import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import cloudinary from "../lib/cloudinary.js";
+import os from "os";
 
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -120,5 +121,27 @@ export const checkAuth = (req, res) => {
   } catch (error) {
     console.log("Error in checkAuth controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getNetworkIp = (req, res) => {
+  try {
+    const interfaces = os.networkInterfaces();
+    let networkIp = "localhost";
+
+    for (const name of Object.keys(interfaces)) {
+      for (const iface of interfaces[name]) {
+        if (iface.family === 'IPv4' && !iface.internal) {
+          networkIp = iface.address;
+          break;
+        }
+      }
+      if (networkIp !== "localhost") break;
+    }
+
+    res.status(200).json({ ip: networkIp });
+  } catch (error) {
+    console.error("Error getting network IP:", error.message);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

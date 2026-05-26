@@ -44,7 +44,11 @@ export const connectDB = async (retries = 5, delay = 5000) => {
 const startMemoryServer = async () => {
     try {
         if (!mongoMemoryServer) {
-            mongoMemoryServer = await MongoMemoryServer.create();
+            mongoMemoryServer = await MongoMemoryServer.create({
+                instance: {
+                    launchTimeout: 60000
+                }
+            });
             const uri = mongoMemoryServer.getUri();
             await mongoose.connect(uri);
             console.log("✅ In-Memory MongoDB started and connected!");
